@@ -1,12 +1,5 @@
-togglz:
-  features:
-    DISCOUNT_APPLIED:
-      enabled: true
-  features-file: 'file://Users/javatechie/Desktop/feature.properties'
-  console:
-    secured: false
-management:
-  endpoints:
-    web:
-      exposure:
-        include: 'togglz'
+launchdarkly:
+  sdk:
+    key: ${LD_SDK_KEY:}
+  flag:
+    discount-applied: discount-applied
