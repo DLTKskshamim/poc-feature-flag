@@ -1,47 +1,34 @@
 package com.javatechie;
 
 import com.javatechie.dto.Product;
-import com.javatechie.service.FeatureFlagService;
+import com.javatechie.pricing.PricingStrategyFactory;
 import com.javatechie.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
 @RestController
 public class SwitchFeatureApplication {
+
     @Autowired
-    private FeatureFlagService featureFlagService;
+    private PricingStrategyFactory pricingStrategyFactory;
 
     @Autowired
     private InventoryService service;
 
-    // The LaunchDarkly flag key (create this flag in the LaunchDarkly dashboard).
-    @Value("${launchdarkly.flag.discount-applied:discount-applied}")
-    private String discountFlagKey;
-
+    /**
+     * Notice there is NO inline "if (flag) ... else ...". The factory owns the
+     * flag decision and hands back the right pricing strategy; the controller
+     * just runs it. This is the lightweight Factory Pattern in action.
+     */
     @GetMapping("/orders")
     public List<Product> showAvailableProducts() {
-        if (featureFlagService.isEnabled(discountFlagKey)) {
-            return applyDiscount(service.getAllProducts());
-        } else {
-            return service.getAllProducts();
-        }
-    }
-
-    private List<Product> applyDiscount(List<Product> availableProducts) {
-        List<Product> orderListAfterDiscount = new ArrayList<>();
-        availableProducts.forEach(order -> {
-            order.setPrice(order.getPrice() - (order.getPrice() * 5 / 100));
-            orderListAfterDiscount.add(order);
-        });
-        return orderListAfterDiscount;
+        return pricingStrategyFactory.create().apply(service.getAllProducts());
     }
 
     public static void main(String[] args) {

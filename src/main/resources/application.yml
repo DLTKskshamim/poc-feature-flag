@@ -1,5 +1,8 @@
 launchdarkly:
   sdk:
+    # Server-side SDK key is a SECRET -- provide it at runtime via the
+    # LD_SDK_KEY environment variable. Do NOT hardcode it here.
+    # If unset, the app starts in OFFLINE mode (flags serve their code defaults).
     key: ${LD_SDK_KEY:}
-  flag:
-    discount-applied: discount-applied
+# Flag keys are NOT configured here -- they live in the central registry
+# (com.javatechie.featureflag.FeatureFlag), per the hardening standard.
