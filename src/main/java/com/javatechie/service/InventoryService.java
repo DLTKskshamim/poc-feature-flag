@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 @Service
 public class InventoryService {
-
     public List<Product> getAllProducts() {
         return Stream.of(new Product(1, "mobile", 50000),
                 new Product(2, "headphone", 2000),
